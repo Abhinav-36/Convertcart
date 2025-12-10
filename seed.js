@@ -250,13 +250,18 @@ async function seedDatabase() {
     }
 }
 
-// Run it
-seedDatabase()
-    .then(() => {
-        console.log('All good!');
-        process.exit(0);
-    })
-    .catch((err) => {
-        console.error('Failed:', err);
-        process.exit(1);
-    });
+// Export for use in other files
+module.exports = { seedDatabase };
+
+// Run it if called directly (not imported)
+if (require.main === module) {
+    seedDatabase()
+        .then(() => {
+            console.log('All good!');
+            process.exit(0);
+        })
+        .catch((err) => {
+            console.error('Failed:', err);
+            process.exit(1);
+        });
+}
