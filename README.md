@@ -190,7 +190,7 @@ curl "http://localhost:3000/search/dishes?name=biryani&minPrice=150&maxPrice=300
 
 ### Other Platforms
 
-**Railway**: Similar process, add MySQL service and set environment variables
+**Railway**: See [RAILWAY_SETUP.md](./RAILWAY_SETUP.md) for complete setup guide. Railway automatically provides `MYSQL_*` environment variables - no configuration needed!
 **Heroku**: Add ClearDB or JawsDB MySQL addon, set config vars
 **Vercel**: Use serverless functions (requires code adjustments)
 

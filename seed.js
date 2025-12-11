@@ -1,29 +1,45 @@
 require('dotenv').config();
 const mysql = require('mysql2/promise');
 
-// DB config
+// Railway MySQL Configuration
+// Railway automatically provides these environment variables:
+// - MYSQL_HOST
+// - MYSQL_USER
+// - MYSQL_PASSWORD
+// - MYSQL_DATABASE
+// - MYSQL_PORT
+
 const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'restaurant_db'
+    host: process.env.MYSQL_HOST || 'localhost',
+    user: process.env.MYSQL_USER || 'root',
+    password: process.env.MYSQL_PASSWORD || '',
+    database: process.env.MYSQL_DATABASE || 'restaurant_db',
+    port: parseInt(process.env.MYSQL_PORT || '3306')
 };
 
 async function seedDatabase() {
     let connection = null;
     
     try {
-        // Need to connect without DB first to create it
-        const tempConfig = Object.assign({}, dbConfig);
-        delete tempConfig.database;
-        
-        connection = await mysql.createConnection(tempConfig);
-        
-        // Create DB
-        await connection.query(`CREATE DATABASE IF NOT EXISTS ${dbConfig.database}`);
-        await connection.query(`USE ${dbConfig.database}`);
-        
-        console.log('Connected to MySQL');
+        // For Railway: database is already created, connect directly
+        // For local: try to create database if it doesn't exist
+        if (process.env.MYSQL_HOST && process.env.MYSQL_HOST !== 'localhost') {
+            // Railway environment - database already exists
+            connection = await mysql.createConnection(dbConfig);
+            console.log('Connected to Railway MySQL');
+        } else {
+            // Local development - create database if needed
+            const tempConfig = Object.assign({}, dbConfig);
+            delete tempConfig.database;
+            
+            connection = await mysql.createConnection(tempConfig);
+            
+            // Create DB if it doesn't exist
+            await connection.query(`CREATE DATABASE IF NOT EXISTS ${dbConfig.database}`);
+            await connection.query(`USE ${dbConfig.database}`);
+            
+            console.log('Connected to MySQL');
+        }
         
         // Setup tables
         const createRestaurantsTable = `
